@@ -1,0 +1,76 @@
+-- Step 1: Create the Library Database
+CREATE DATABASE LibraryDB;
+USE LibraryDB;
+
+-- Step 2: Create Books Table
+CREATE TABLE Books (
+    BookID INT PRIMARY KEY AUTO_INCREMENT,
+    Title VARCHAR(255) NOT NULL,
+    Author VARCHAR(255) NOT NULL,
+    Genre VARCHAR(100),
+    AvailableCopies INT DEFAULT 1
+);
+
+-- Step 3: Create Members Table
+CREATE TABLE Members (
+    MemberID INT PRIMARY KEY AUTO_INCREMENT,
+    Name VARCHAR(255) NOT NULL,
+    Email VARCHAR(255) UNIQUE NOT NULL,
+    Phone VARCHAR(15),
+    JoinDate DATE DEFAULT CURRENT_DATE
+);
+
+-- Step 4: Create Borrowing Table
+CREATE TABLE Borrowing (
+    BorrowID INT PRIMARY KEY AUTO_INCREMENT,
+    MemberID INT,
+    BookID INT,
+    BorrowDate DATE DEFAULT CURRENT_DATE,
+    ReturnDate DATE,
+    FOREIGN KEY (MemberID) REFERENCES Members(MemberID),
+    FOREIGN KEY (BookID) REFERENCES Books(BookID)
+);
+
+-- Step 5: Insert Sample Books Data
+INSERT INTO Books (Title, Author, Genre, AvailableCopies) VALUES
+('The Great Gatsby', 'F. Scott Fitzgerald', 'Classic', 5),
+('1984', 'George Orwell', 'Dystopian', 3),
+('To Kill a Mockingbird', 'Harper Lee', 'Fiction', 4);
+
+-- Step 6: Insert Sample Members Data
+INSERT INTO Members (Name, Email, Phone) VALUES
+('Alice Johnson', 'alice@email.com', '1234567890'),
+('Bob Smith', 'bob@email.com', '9876543210');
+
+-- Step 7: Insert Sample Borrowing Records
+INSERT INTO Borrowing (MemberID, BookID, BorrowDate, ReturnDate) VALUES
+(1, 2, '2024-03-01', '2024-03-10'),
+(2, 1, '2024-03-05', NULL);
+
+-- Step 8: Retrieve all books
+SELECT * FROM Books;
+
+-- Step 9: Retrieve available books
+SELECT Title, Author, AvailableCopies 
+FROM Books 
+WHERE AvailableCopies > 0;
+
+-- Step 10: View borrowing records with member and book details
+SELECT Members.Name, Books.Title, Borrowing.BorrowDate, Borrowing.ReturnDate
+FROM Borrowing
+JOIN Members ON Borrowing.MemberID = Members.MemberID
+JOIN Books ON Borrowing.BookID = Books.BookID;
+
+-- Step 11: Update book availability when borrowed
+UPDATE Books 
+SET AvailableCopies = AvailableCopies - 1 
+WHERE BookID = 2;
+
+-- Step 12: Return a book and update records
+UPDATE Borrowing 
+SET ReturnDate = '2024-03-15' 
+WHERE BorrowID = 1;
+
+UPDATE Books 
+SET AvailableCopies = AvailableCopies + 1 
+WHERE BookID = 2;
